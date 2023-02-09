@@ -2,32 +2,9 @@ import cv2
 import numpy as np
 import os
 
-
-'''
-# Muestra bordes con la cámara 
-vid = cv2.VideoCapture(0)
-while True:
-    ret, frame = vid.read()
-    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray_frame, 50, 150)
-    contours, hierarchy = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    cv2.drawContours(frame, contours, -1, (0, 255, 0), 3)
-    cv2.imshow('Canny Edges After Contouring', edges)
-    cv2.imshow("bordes", frame)
-
-
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-vid.release()
-# Destroy all the windows
-cv2.destroyAllWindows()
-'''
-
-GENERAL_PATH = os.getcwd()
-img = cv2.imread(GENERAL_PATH+"/Dataset/cafe_maloEI/DSCN0PINTON3.JPG")
-gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-
+# method that apply sobel filter over one image
+# input: image
+# output: threshold of the contours
 def sobel_filter(img):
     # Apply the Sobel filter to get the gradient magnitude
     sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=5)
@@ -48,6 +25,42 @@ def sobel_filter(img):
     _, thresholded = cv2.threshold(cv2.convertScaleAbs(gradient_magnitude), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     return thresholded
+
+# Muestra bordes con la cámara 
+vid = cv2.VideoCapture(0)
+while True:
+    ret, frame = vid.read()
+    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #edges = cv2.Canny(gray_frame, 50, 150)
+    #contours, hierarchy = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    threshold = sobel_filter(gray_frame)
+    contours, _ = cv2.findContours(threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    #cv2.drawContours(frame, contours, -1, (0, 255, 0), 3)
+    for c in contours:
+        area = cv2.contourArea(c)
+        if area > 80000:
+            cv2.drawContours(frame, [c], -1, (0, 255, 0), 5)
+            print(area)
+    #cv2.imshow('Canny Edges After Contouring', edges)
+    cv2.imshow("bordes", frame)
+
+
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+vid.release()
+# Destroy all the windows
+cv2.destroyAllWindows()
+
+
+GENERAL_PATH = os.getcwd()
+img = cv2.imread(GENERAL_PATH+"/Dataset/cafe_buenoEI/DSCN0402.JPG")
+gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+"""
+'''
+    implementation of canny edges and sobel filter in images
+'''
 # implementation canny edge
 blurred = cv2.GaussianBlur(gray_img, (3, 3), 0)
 # edges = cv2.Canny(blurred, 30, 100)
@@ -60,14 +73,17 @@ contours, _ = cv2.findContours(threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NO
 print("Number of Contours found = " + str(len(contours)))
 for c in contours:
     area = cv2.contourArea(c)
-    if area > 3500:
+    if  area > 10000:
         cv2.drawContours(img, [c], -1, (0, 255, 0), 5)
+        print(area)
 
 
 # Draw all contours
 # -1 signifies drawing all contours
 #cv2.drawContours(img, [largest_contour], -1, (0, 255, 0), 3)
 #cv2.drawContours(img, contours, -1, (0, 255, 0), 2)
+"""
+
 
 '''
 ---------------------------------------------------------
