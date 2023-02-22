@@ -38,7 +38,7 @@ while True:
     #cv2.drawContours(frame, contours, -1, (0, 255, 0), 3)
     for c in contours:
         area = cv2.contourArea(c)
-        if area > 80000:
+        if area > 8000:
             cv2.drawContours(frame, [c], -1, (0, 255, 0), 5)
             print(area)
     #cv2.imshow('Canny Edges After Contouring', edges)
@@ -66,7 +66,7 @@ blurred = cv2.GaussianBlur(gray_img, (3, 3), 0)
 # edges = cv2.Canny(blurred, 30, 100)
 threshold = sobel_filter(gray_img)
 # contours, hierarchy = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-contours, _ = cv2.findContours(threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+contours, _ = cv2.findContours(threshold, cv2.RETR_EXqTERNAL, cv2.CHAIN_APPROX_NONE)
 #edges = cv2.resize(edges, (800, 600))
 #cv2.imshow('Canny Edges After Contouring', edges)
 #cv2.waitKey(0)
