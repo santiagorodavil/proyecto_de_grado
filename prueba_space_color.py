@@ -1,16 +1,25 @@
 import cv2
 import os
 import numpy as np
+import matplotlib.pyplot as plt
+import time
 
 GENERAL_PATH = os.getcwd()
-for file in os.listdir(GENERAL_PATH+"/Dataset/cafe_maloEI/"):
-    print(file)
-    img = cv2.imread(GENERAL_PATH+"/Dataset/cafe_maloEI/"+file)
+test_times = []
+num_photos = []
+contador = 0
+total_time = time.time()
+for file in os.listdir(GENERAL_PATH+"/Dataset/cafe_buenoEI/"):
+    start_time = time.time()
+    #print(file)
+    img = cv2.imread(GENERAL_PATH+"/Dataset/cafe_buenoEI/"+file)
+    img = cv2.resize(img, (640, 480)) #para hacer las fotos pequeñas
     lab_img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+
 
     # Red mask
     lower_red = np.array([0, 120, 0])
-    upper_red = np.array([100, 200, 150])
+    upper_red = np.array([50, 200, 150]) #Ligthness, rojo a verde, azul a amarillo
     mask = cv2.inRange(lab_img, lower_red, upper_red)
 
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
@@ -21,13 +30,32 @@ for file in os.listdir(GENERAL_PATH+"/Dataset/cafe_maloEI/"):
         area = cv2.contourArea(c)
         if area > 70000:
             cv2.drawContours(img, [c], -1, (0, 255, 0), 5)
-            print(area)
-    result = cv2.resize(result, (400, 300))
-    img = cv2.resize(img,(400,300))
+            #print(area)
+    #result = cv2.resize(result, (640, 480))
+    #img = cv2.resize(img, (640, 480))
+
+    total_time = time.time() - start_time
+    test_times.append(total_time)
+    num_photos.append(contador)
+    contador += 1
+    print("Tiempo de ejecucion de foto "+ str(file)+": "+ str(total_time))
     #cv2.imshow("prueba"+file, result)
-    cv2.imshow("foto con bordes" + file,img)
+    #cv2.imshow("foto con bordes" + file,img)
 cv2.waitKey(0)
 
+timepo_deseado = [0.03]*len(test_times)
+
+final_time = time.time() - total_time
+print(sum(test_times)/len(test_times), final_time%60)
+plt.plot(num_photos, test_times)
+plt.plot(num_photos, timepo_deseado, "r--")
+plt.title("Analisis de tiempo fotos (640, 480)")
+plt.ylabel("tiempo estimado por foto")
+plt.ylim(0,1.3)
+plt.xlabel("Foto a analizar")
+plt.legend(["Tiempo x foto (s)", "Tiempo deseado(s)"])
+plt.grid()
+plt.show()
 
 
 
