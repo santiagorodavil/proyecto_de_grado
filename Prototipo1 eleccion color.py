@@ -56,7 +56,29 @@ while True:
 
             nuevo_contorno = cv2.convexHull(c)
             cv2.drawContours(frame, [nuevo_contorno], 0, (255, 0, 0), 3)
-            print('Area: ',area)
+
+            if y < 240:
+                if x <= 213:
+                    print("zona 1 hay cafe bueno")
+                    cv2.rectangle(frame, (15, 15), (200, 230), (12, 180, 12), 5)
+                elif 213<x<426:
+                    print("zona 2 hay cafe bueno")
+                    cv2.rectangle(frame, (220, 15), (410, 230), (12, 180, 12), 5)
+                elif 426<x<639:
+                    print("zona 3 hay cafe bueno")
+                    cv2.rectangle(frame, (430, 15), (630, 230), (12, 180, 12), 5)
+            elif y >= 240:
+                if x <= 213:
+                    print("zona 4 hay cafe bueno")
+                    cv2.rectangle(frame, (15, 255), (200, 470), (12, 180, 12), 5)
+                elif 213 < x < 426:
+                    print("zona 5 hay cafe bueno")
+                    cv2.rectangle(frame, (220, 255), (410, 470), (12, 180, 12), 5)
+                elif 426 < x < 639:
+                    print("zona 6 hay cafe bueno")
+                    cv2.rectangle(frame, (430, 255), (630, 470), (12, 180, 12), 5)
+
+            #print('Area: ',area)
             val_led = 1
             #serialArduino.write(bytes(str(val_led), 'utf-8'))
 
