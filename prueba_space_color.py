@@ -5,53 +5,67 @@ import matplotlib.pyplot as plt
 import time
 
 GENERAL_PATH = os.getcwd()
+n = 25
 test_times = []
 num_photos = []
 contador = 0
 total_time = time.time()
+# Creo diccionario con nombre de las fotos
+test_dict = {}
 for file in os.listdir(GENERAL_PATH+"/Dataset/cafe_buenoEI/"):
-    start_time = time.time()
-    #print(file)
-    img = cv2.imread(GENERAL_PATH+"/Dataset/cafe_buenoEI/"+file)
-    img = cv2.resize(img, (640, 480)) #para hacer las fotos pequeñas
-    lab_img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    test_dict[file]=0
+
+for i in range(0,n):
+
+    for file in os.listdir(GENERAL_PATH+"/Dataset/cafe_buenoEI/"):
+        #print(file)
+        img = cv2.imread(GENERAL_PATH+"/Dataset/cafe_buenoEI/"+file)
+        img = cv2.resize(img, (640, 480)) #para hacer las fotos pequeñas
+        lab_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        start_time = time.time()
 
 
-    # Red mask
-    lower_red = np.array([0, 120, 0])
-    upper_red = np.array([50, 200, 150]) #Ligthness, rojo a verde, azul a amarillo
-    mask = cv2.inRange(lab_img, lower_red, upper_red)
+        # Red mask
+        lower_red = np.array([0, 120, 0])
+        upper_red = np.array([50, 200, 150]) #Ligthness, rojo a verde, azul a amarillo
+        mask = cv2.inRange(lab_img, lower_red, upper_red)
 
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-    result = cv2.bitwise_and(img, img, mask=mask)
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    for c in contours:
-        area = cv2.contourArea(c)
-        if area > 70000:
-            cv2.drawContours(img, [c], -1, (0, 255, 0), 5)
-            #print(area)
-    #result = cv2.resize(result, (640, 480))
-    #img = cv2.resize(img, (640, 480))
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        result = cv2.bitwise_and(img, img, mask=mask)
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        for c in contours:
+            area = cv2.contourArea(c)
+            if area > 70000:
+                cv2.drawContours(img, [c], -1, (0, 255, 0), 5)
+                #print(area)
+        #result = cv2.resize(result, (640, 480))
+        #img = cv2.resize(img, (640, 480))
 
-    total_time = time.time() - start_time
-    test_times.append(total_time)
-    num_photos.append(contador)
-    contador += 1
-    print("Tiempo de ejecucion de foto "+ str(file)+": "+ str(total_time))
-    #cv2.imshow("prueba"+file, result)
-    #cv2.imshow("foto con bordes" + file,img)
-cv2.waitKey(0)
-
+        total_time = time.time() - start_time
+        #test_times.append(total_time)
+        test_dict[file] += total_time
+        if i == 0:
+            num_photos.append(contador)
+            contador += 1
+        ##print("Tiempo de ejecucion de foto "+ str(file)+": "+ str(total_time))
+        #cv2.imshow("prueba"+file, result)
+        #cv2.imshow("foto con bordes" + file,img)
+    print(i)
+#cv2.waitKey(0)
+print("dict sin prom: ", test_dict.values())
+for i in test_dict.values():
+    test_times.append(i/n)
+print("list con prom: ", len(test_times), len(num_photos))
 timepo_deseado = [0.03]*len(test_times)
 
 final_time = time.time() - total_time
 print(sum(test_times)/len(test_times), final_time%60)
 plt.plot(num_photos, test_times)
 plt.plot(num_photos, timepo_deseado, "r--")
-plt.title("Analisis de tiempo fotos (640, 480)")
-plt.ylabel("tiempo estimado por foto")
-plt.ylim(0,1.3)
+plt.title("Analisis de tiempo fotos (640, 480) HSV")
+plt.ylabel("tiempo estimado por foto (promedio 25 iteraciones)")
+#plt.ylim(0,0.035)
 plt.xlabel("Foto a analizar")
 plt.legend(["Tiempo x foto (s)", "Tiempo deseado(s)"])
 plt.grid()
