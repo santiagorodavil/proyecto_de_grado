@@ -47,7 +47,15 @@ while True:
     for c in contornos:
         area = cv2.contourArea(c)
         if area > 2500:
-            cv2.drawContours(frame, [c], 0, (255, 0, 0), 3)
+            M = cv2.moments(c)
+            if M["m00"] == 0: M["m00"] = 1
+            x = int(M["m10"]/M["m00"])
+            y = int(M["m01"]/M["m00"])
+            cv2.circle(frame, (x, y), 6, (250, 50, 50), -1)
+
+
+            nuevo_contorno = cv2.convexHull(c)
+            cv2.drawContours(frame, [nuevo_contorno], 0, (255, 0, 0), 3)
             print('Area: ',area)
             val_led = 1
             #serialArduino.write(bytes(str(val_led), 'utf-8'))
