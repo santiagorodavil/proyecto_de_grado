@@ -19,10 +19,14 @@ mot_led = 0
 #serialArduino = serial.Serial(port='COM3', baudrate=9600, timeout=.1)
 
 # Mascara de color rojo (Las necesarias papra el cafe)
-lower_red = np.array([80, 100, 100])# HS
-upper_red = np.array([180, 150, 200])
+#lower_red = np.array([0, 125, 75])# HSV
+#upper_red = np.array([60, 255, 185])
+lower_red1 = np.array([0, 50, 45])# HSV2 -H[160-175,0-20] S[75-255] V[45,180]rojo
+upper_red1 = np.array([20, 255, 180])
+lower_red2 = np.array([165, 50, 45])
+upper_red2 = np.array([179, 255, 180])
 #lower_red = np.array([80, 120, 110])# lab
-#upper_red = np.array([150, 180, 150])
+#upper_red = np.array([110, 180, 150])
 video = cv2.VideoCapture(0)
 # if video.isOpened():
 #   video.release()
@@ -34,7 +38,9 @@ while True:
     # crear una mascara del color que se quiera tener
     start_time = time.time()
     framelab = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    mascara = cv2.inRange(framelab, lower_red, upper_red)
+    red_mask1 = cv2.inRange(framelab, lower_red1, upper_red1)
+    red_mask2 = cv2.inRange(framelab, lower_red2, upper_red2)
+    mascara = cv2.add(red_mask1, red_mask2)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
     mascara = cv2.morphologyEx(mascara, cv2.MORPH_OPEN, kernel)
     result = cv2.bitwise_and(frame, frame, mask=mascara)
