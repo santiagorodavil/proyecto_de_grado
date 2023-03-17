@@ -164,3 +164,17 @@ while a < 9:
     a += 1
 
 '''
+
+
+
+
+
+'''
+TODO:
+
+crear metodo dibujar contornos para color rojo y verde. 
+Crear metodo que compare tamaño de
+
+
+primero analizo si hay verde en la seccion, si hay -> Cuadro rojo, pasar a siguiente frame (no hay necesidad de analizar rojo porque ya es cafe malo)
+'''
