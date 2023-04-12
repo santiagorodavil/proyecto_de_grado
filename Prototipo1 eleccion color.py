@@ -18,13 +18,66 @@ mot_led = 0
 
 #serialArduino = serial.Serial(port='COM3', baudrate=9600, timeout=.1)
 
-# Mascara de color rojo (Las necesarias papra el cafe)
-#lower_red = np.array([0, 125, 75])# HSV
-#upper_red = np.array([60, 255, 185])
+# red mask
 lower_red1 = np.array([0, 50, 45])# HSV2 -H[160-175,0-20] S[75-255] V[45,180]rojo
 upper_red1 = np.array([20, 255, 180])
 lower_red2 = np.array([165, 50, 45])
 upper_red2 = np.array([179, 255, 180])
+
+# green mask
+lower_green = np.array([30, 145, 155])
+upper_green = np.array([60, 255, 255])
+
+# funcion que detecta los bordes segun la mascara que se le pase
+def find_contours(mascara, color):
+    mascara_verde = ('g' == color)
+    # Find contours tiene 3 entradas, imagen, contorno y jerarquia
+    contornos, _ = cv2.findContours(mascara, cv2.RETR_EXTERNAL,
+                                    cv2.CHAIN_APPROX_SIMPLE)
+
+    # Dibujar contorno para objetos mayores a cierta area
+    for c in contornos:
+        area = cv2.contourArea(c)
+        if area > 2500:
+            M = cv2.moments(c)
+            if M["m00"] == 0: M["m00"] = 1
+            x = int(M["m10"] / M["m00"])
+            y = int(M["m01"] / M["m00"])
+            cv2.circle(frame, (x, y), 6, (250, 50, 50), -1)
+
+            nuevo_contorno = cv2.convexHull(c)
+            cv2.drawContours(frame, [nuevo_contorno], 0, (255, 0, 0), 3)
+
+            if y < 240:
+                if x <= 213:
+                    #if mascara_verde: pass
+                    print("zona 1 hay cafe bueno")
+                    cv2.rectangle(frame, (15, 15), (200, 230), (12, 180, 12), 5)
+                elif 213 < x < 426:
+                    #if mascara_verde: pass
+                    print("zona 2 hay cafe bueno")
+                    cv2.rectangle(frame, (220, 15), (410, 230), (12, 180, 12), 5)
+                elif 426 < x < 639:
+                    #if mascara_verde: pass
+                    print("zona 3 hay cafe bueno")
+                    cv2.rectangle(frame, (430, 15), (630, 230), (12, 180, 12), 5)
+            elif y >= 240:
+                if x <= 213:
+                    if mascara_verde: pass
+                    print("zona 4 hay cafe bueno")
+                    cv2.rectangle(frame, (15, 255), (200, 470), (12, 180, 12), 5)
+                elif 213 < x < 426:
+                    if not mascara_verde:
+                        print("zona 5 hay cafe bueno")
+                        cv2.rectangle(frame, (220, 255), (410, 470), (12, 180, 12), 5)
+                    else: pass
+                elif 426 < x < 639:
+                    if not mascara_verde:
+                        print("zona 6 hay cafe bueno")
+                        cv2.rectangle(frame, (430, 255), (630, 470), (12, 180, 12), 5)
+                    else: pass
+
+
 #lower_red = np.array([80, 120, 110])# lab
 #upper_red = np.array([110, 180, 150])
 video = cv2.VideoCapture(0)
@@ -42,13 +95,20 @@ while True:
     red_mask2 = cv2.inRange(framelab, lower_red2, upper_red2)
     mascara = cv2.add(red_mask1, red_mask2)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
-    mascara = cv2.morphologyEx(mascara, cv2.MORPH_OPEN, kernel)
-    result = cv2.bitwise_and(frame, frame, mask=mascara)
+    mascara_roja = cv2.morphologyEx(mascara, cv2.MORPH_OPEN, kernel)
+    #result = cv2.bitwise_and(frame, frame, mask=mascara)
 
+
+
+    mascara_verde = cv2.inRange(framelab, lower_green, upper_green)
+    mascara_verde = cv2.morphologyEx(mascara_verde, cv2.MORPH_OPEN, kernel)
+
+    find_contours(mascara_verde,'g')
+    find_contours(mascara_roja,'r')
+    '''
     # Find contours tiene 3 entradas, imagen, contorno y jerarquia
     contornos, _ = cv2.findContours(mascara, cv2.RETR_EXTERNAL,
                                     cv2.CHAIN_APPROX_SIMPLE)
-
     # Dibujar contorno para objetos mayores a cierta area
     for c in contornos:
         area = cv2.contourArea(c)
@@ -83,11 +143,12 @@ while True:
                 elif 426 < x < 639:
                     print("zona 6 hay cafe bueno")
                     cv2.rectangle(frame, (430, 255), (630, 470), (12, 180, 12), 5)
-
+            
+        
             #print('Area: ',area)
             val_led = 1
             #serialArduino.write(bytes(str(val_led), 'utf-8'))
-
+    '''
     #serialArduino.write(bytes(str(val_led), 'utf-8'))
     #data = serialArduino.readline()
     #print(data, val_led)
@@ -96,7 +157,8 @@ while True:
     cv2.line(frame, (0, 240), (640, 240), (80, 80, 80), 3)
     cv2.line(frame, (213, 0), (213, 480), (80, 80, 80), 3)
     cv2.line(frame, (426, 0), (426, 480), (80, 80, 80), 3)
-    cv2.imshow("mascara", mascara)
+    cv2.imshow("mascara roja", mascara)
+    cv2.imshow("mascara verde", mascara_verde)
     cv2.imshow("Stream", frame)
     val_led = 0
     # val_led = 0
