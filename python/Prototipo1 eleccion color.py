@@ -85,15 +85,7 @@ def find_contours(mascara, color):
                         cv2.rectangle(frame, (430, 255), (630, 470), (12, 180, 12), 5)
                     else: pass
 
-
-
-
-#lower_red = np.array([80, 120, 110])# lab
-#upper_red = np.array([110, 180, 150])
 video = cv2.VideoCapture(0)
-# if video.isOpened():
-#   video.release()
-
 
 while True:
     ret, frame = video.read()
@@ -115,60 +107,16 @@ while True:
 
     find_contours(mascara_verde,'g')
     find_contours(mascara_roja,'r')
-    '''
-    # Find contours tiene 3 entradas, imagen, contorno y jerarquia
-    contornos, _ = cv2.findContours(mascara, cv2.RETR_EXTERNAL,
-                                    cv2.CHAIN_APPROX_SIMPLE)
-    # Dibujar contorno para objetos mayores a cierta area
-    for c in contornos:
-        area = cv2.contourArea(c)
-        if area > 2500:
-            M = cv2.moments(c)
-            if M["m00"] == 0: M["m00"] = 1
-            x = int(M["m10"]/M["m00"])
-            y = int(M["m01"]/M["m00"])
-            cv2.circle(frame, (x, y), 6, (250, 50, 50), -1)
 
-
-            nuevo_contorno = cv2.convexHull(c)
-            cv2.drawContours(frame, [nuevo_contorno], 0, (255, 0, 0), 3)
-
-            if y < 240:
-                if x <= 213:
-                    print("zona 1 hay cafe bueno")
-                    cv2.rectangle(frame, (15, 15), (200, 230), (12, 180, 12), 5)
-                elif 213<x<426:
-                    print("zona 2 hay cafe bueno")
-                    cv2.rectangle(frame, (220, 15), (410, 230), (12, 180, 12), 5)
-                elif 426<x<639:
-                    print("zona 3 hay cafe bueno")
-                    cv2.rectangle(frame, (430, 15), (630, 230), (12, 180, 12), 5)
-            elif y >= 240:
-                if x <= 213:
-                    print("zona 4 hay cafe bueno")
-                    cv2.rectangle(frame, (15, 255), (200, 470), (12, 180, 12), 5)
-                elif 213 < x < 426:
-                    print("zona 5 hay cafe bueno")
-                    cv2.rectangle(frame, (220, 255), (410, 470), (12, 180, 12), 5)
-                elif 426 < x < 639:
-                    print("zona 6 hay cafe bueno")
-                    cv2.rectangle(frame, (430, 255), (630, 470), (12, 180, 12), 5)
-            
-        
-            #print('Area: ',area)
-            val_led = 1
-            #serialArduino.write(bytes(str(val_led), 'utf-8'))
-    '''
     serial_msg = ''.join(str(i) for i in encendidos)
     serial_msg+="\n"
-    print(serial_msg + " ******")
+    #print(serial_msg + " ******")
     serialArduino.write(serial_msg.encode('utf-8'))
     data = serialArduino.readline()
-    print(data)
+    #print(data)
 
     final_time = time.time()-start_time
-    #print(encendidos)
-    #print("Tiempo x foto: ",final_time)
+    print("Tiempo x foto: ",final_time)
     cv2.line(frame, (0, 240), (640, 240), (80, 80, 80), 3)
     cv2.line(frame, (213, 0), (213, 480), (80, 80, 80), 3)
     cv2.line(frame, (426, 0), (426, 480), (80, 80, 80), 3)
@@ -192,59 +140,6 @@ while True:
 
 video.release()
 cv2.destroyAllWindows()
-#serialArduino.write(bytes(str(2), 'utf-8'))
-#data = serialArduino.readline()
-#print(data, val_led)
-# serialArduino = serial.Serial(port='COM3', baudrate=9600, timeout=.1)
-
-# Estructura para mandar algo a arduino:
-# 1. Crear un string que tenga: val_led = str(pin que se quiera)+ ','+ str(valor que se quiera tener en arduino)
-#  serialArduino.write(bytes(str(val_led), 'utf-8'))
-#  data = serialArduino.readline()
-#  print(data, val_led)
-'''
-import serial
-import time
-
-arduino = serial.Serial(port='COM3', baudrate=9600, timeout=.1)
-
-
-def write_read(x):
-    arduino.write(bytes(x, 'utf-8'))
-    time.sleep(0.05)
-    data = arduino.readline()
-    return data
-
-
-while True:
-    num = input("Enter a number: ")  # Taking input from user
-    value = write_read(num)
-    print(value)  # print
-'''
-
-'''a = 0
-while a < 9:
-    if val_led != 0:
-        val_led = 0
-        cad = str(val_led)
-        serialArduino.write(bytes(str(val_led), 'utf-8'))
-        time.sleep(1.0)
-        data = serialArduino.readline()
-        print("if", data)
-    else:
-        val_led = 1
-        cad = str(val_led)
-        serialArduino.write(bytes(str(val_led), 'utf-8'))
-        time.sleep(1.0)
-        data = serialArduino.readline()
-        print('else', data)
-    a += 1
-
-'''
-
-
-
-
 
 '''
 TODO:
