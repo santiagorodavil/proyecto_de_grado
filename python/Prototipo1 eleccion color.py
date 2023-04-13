@@ -18,7 +18,7 @@ pin_3 = 8
 pin_4 = 9
 pin_5 = 10
 encendidos = [0, 0, 0, 0, 0, 0]
-#serialArduino = serial.Serial(port='COM3', baudrate=9600, timeout=.1)
+serialArduino = serial.Serial(port='COM5', baudrate=9600, timeout=.1)
 
 # red mask
 lower_red1 = np.array([0, 50, 45])# HSV2 -H[160-175,0-20] S[75-255] V[45,180]rojo
@@ -53,37 +53,38 @@ def find_contours(mascara, color):
             if y < 240:
                 if x <= 213:
                     #if mascara_verde: pass
-                    print("zona 1 hay cafe bueno")
+                    #print("zona 1 hay cafe bueno")
                     encendidos[0] = 1
                     cv2.rectangle(frame, (15, 15), (200, 230), (12, 180, 12), 5)
                 elif 213 < x < 426:
                     #if mascara_verde: pass
-                    print("zona 2 hay cafe bueno")
+                    #print("zona 2 hay cafe bueno")
                     encendidos[1] = 1
                     cv2.rectangle(frame, (220, 15), (410, 230), (12, 180, 12), 5)
                 elif 426 < x < 639:
                     #if mascara_verde: pass
-                    print("zona 3 hay cafe bueno")
+                    #print("zona 3 hay cafe bueno")
                     encendidos[2] = 1
                     cv2.rectangle(frame, (430, 15), (630, 230), (12, 180, 12), 5)
             elif y >= 240:
                 if x <= 213:
                     if mascara_verde: pass
-                    print("zona 6 hay cafe bueno")
+                    #print("zona 6 hay cafe bueno")
                     encendidos[5] = 1
                     cv2.rectangle(frame, (15, 255), (200, 470), (12, 180, 12), 5)
                 elif 213 < x < 426:
                     if not mascara_verde:
-                        print("zona 5 hay cafe bueno")
+                        #print("zona 5 hay cafe bueno")
                         encendidos[4] = 1
                         cv2.rectangle(frame, (220, 255), (410, 470), (12, 180, 12), 5)
                     else: pass
                 elif 426 < x < 639:
                     if not mascara_verde:
-                        print("zona 4 hay cafe bueno")
+                        #print("zona 4 hay cafe bueno")
                         encendidos[3] = 1
                         cv2.rectangle(frame, (430, 255), (630, 470), (12, 180, 12), 5)
                     else: pass
+
 
 
 
@@ -158,11 +159,15 @@ while True:
             val_led = 1
             #serialArduino.write(bytes(str(val_led), 'utf-8'))
     '''
-    #serialArduino.write(bytes(str(val_led), 'utf-8'))
-    #data = serialArduino.readline()
-    #print(data, val_led)
+    serial_msg = ''.join(str(i) for i in encendidos)
+    serial_msg+="\n"
+    print(serial_msg + " ******")
+    serialArduino.write(serial_msg.encode('utf-8'))
+    data = serialArduino.readline()
+    print(data)
+
     final_time = time.time()-start_time
-    print(encendidos)
+    #print(encendidos)
     #print("Tiempo x foto: ",final_time)
     cv2.line(frame, (0, 240), (640, 240), (80, 80, 80), 3)
     cv2.line(frame, (213, 0), (213, 480), (80, 80, 80), 3)
@@ -171,7 +176,6 @@ while True:
     cv2.imshow("mascara verde", mascara_verde)
     cv2.imshow("Stream", frame)
     encendidos = [0]*6
-    val_led = 0
     # val_led = 0
     # cad = str(val_led) + "," + str(mot_led)
     # serialArduino.write(cad.encode('ascii'))
