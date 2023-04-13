@@ -40,7 +40,7 @@ def find_contours(mascara, color):
     # Dibujar contorno para objetos mayores a cierta area
     for c in contornos:
         area = cv2.contourArea(c)
-        if area > 2500:
+        if area > 2500 and not mascara_verde:
             M = cv2.moments(c)
             if M["m00"] == 0: M["m00"] = 1
             x = int(M["m10"] / M["m00"])
@@ -52,26 +52,30 @@ def find_contours(mascara, color):
 
             if y < 240:
                 if x <= 213:
-                    #if mascara_verde: pass
-                    #print("zona 1 hay cafe bueno")
-                    encendidos[0] = 1
-                    cv2.rectangle(frame, (15, 15), (200, 230), (12, 180, 12), 5)
+                    if not mascara_verde:
+                        #print("zona 1 hay cafe bueno")
+                        encendidos[0] = 1
+                        cv2.rectangle(frame, (15, 15), (200, 230), (12, 180, 12), 5)
+                    else: pass
                 elif 213 < x < 426:
-                    #if mascara_verde: pass
-                    #print("zona 2 hay cafe bueno")
-                    encendidos[1] = 1
-                    cv2.rectangle(frame, (220, 15), (410, 230), (12, 180, 12), 5)
+                    if not mascara_verde:
+                        #print("zona 2 hay cafe bueno")
+                        encendidos[1] = 1
+                        cv2.rectangle(frame, (220, 15), (410, 230), (12, 180, 12), 5)
+                    else: pass
                 elif 426 < x < 639:
-                    #if mascara_verde: pass
-                    #print("zona 3 hay cafe bueno")
-                    encendidos[2] = 1
-                    cv2.rectangle(frame, (430, 15), (630, 230), (12, 180, 12), 5)
+                    if not mascara_verde:
+                        #print("zona 3 hay cafe bueno")
+                        encendidos[2] = 1
+                        cv2.rectangle(frame, (430, 15), (630, 230), (12, 180, 12), 5)
+                    else: pass
             elif y >= 240:
                 if x <= 213:
-                    if mascara_verde: pass
-                    #print("zona 6 hay cafe bueno")
-                    encendidos[5] = 1
-                    cv2.rectangle(frame, (15, 255), (200, 470), (12, 180, 12), 5)
+                    if not mascara_verde:
+                        #print("zona 6 hay cafe bueno")
+                        encendidos[5] = 1
+                        cv2.rectangle(frame, (15, 255), (200, 470), (12, 180, 12), 5)
+                    else: pass
                 elif 213 < x < 426:
                     if not mascara_verde:
                         #print("zona 5 hay cafe bueno")
@@ -85,7 +89,7 @@ def find_contours(mascara, color):
                         cv2.rectangle(frame, (430, 255), (630, 470), (12, 180, 12), 5)
                     else: pass
 
-video = cv2.VideoCapture(0)
+video = cv2.VideoCapture(1)
 
 while True:
     ret, frame = video.read()
