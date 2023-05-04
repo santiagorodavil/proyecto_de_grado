@@ -1,4 +1,3 @@
-
 int pins[] = {5, 6, 7, 8, 9, 10}; //Pines de los leds arduino
 bool encendido[] = {0,0,0,0,0,0}; //Variables bool de cada led (1, encendido, 0, apagado)
 char info; //Informacion que se lee del serial (uno por uno)
