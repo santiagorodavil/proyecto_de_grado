@@ -5,6 +5,7 @@ int pins[] = {5, 6, 7, 8, 9, 10}; //Pines de los leds arduino
 bool encendido[] = {0,0,0,0,0,0}; //Variables bool de cada led (1, encendido, 0, apagado)
 bool prev_encendido[] = {0,0,0,0,0,0};
 char info; //Informacion que se lee del serial (uno por uno)
+
 void setup()
 {
   Serial.begin(9600);
@@ -14,11 +15,14 @@ void setup()
     pinMode(pins[i], OUTPUT);
 }
 
+// Variables que cuentan los espacios y revisan si las acciones cambian de estado
 int cont =0;
 bool izq, der = false;
+
+
 void loop()
 {
-    //  Lee el serial y añade en su respectiva posicion el valor de encendido o apagado de cada pin
+  // Lee el serial y añade en su respectiva posicion el valor de encendido o apagado de cada pin
   if(Serial.available()!=0){
     char info = Serial.read();
     bool led = false;
@@ -28,6 +32,7 @@ void loop()
     cont +=1;    
   }
 
+  // Banderas que revisan si el movimiento ha cambiado
   if(encendido[0] != prev_encendido[0])
     der= true;
   else
@@ -37,26 +42,21 @@ void loop()
     izq= true;
   else
     izq= false;
-      
+
+  // Enciende los leds y asigna los valores actuales como previos (para verificar si se repiten las acciones)
   if (cont >6){
       cont = 0;
-      Serial.println("-----");
       for(int i = 0; i < 6; i++){
-        if (encendido[i] == true){
-          digitalWrite(pins[i], HIGH);   
-        }                
+        if (encendido[i] == true)
+          digitalWrite(pins[i], HIGH);                   
 
-        else{
+        else
           digitalWrite(pins[i], LOW);
-        //Serial.print(encendido[i]); 
-        }
         prev_encendido[i] = encendido[i];
       }
-    //Serial.println("acabo");
   }
 
-  //Serial.println(cont);
-
+  // Cambia de dirección los servos dependiendo de si la accion cambio de estado
   if (der==true){
     if(encendido[0] == true){
       servo_der.write(40);
